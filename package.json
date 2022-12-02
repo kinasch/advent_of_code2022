@@ -1,0 +1,11 @@
+{
+  "name": "adventskalendeer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "day1": "node ./day1/main.js"
+  },
+  "author": "kinasch",
+  "license": "ISC"
+}
