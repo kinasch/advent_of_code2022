@@ -18,16 +18,18 @@ let data = readFromFile();
 let system = {}; // basically '/'
 let currentFolder = system;
 let history = [];
+const navigator = (obj, path) => path.reduce((a, b) => a && a[b], obj);
 for (let i = 0; i < data.length; i++) {
     if(data[i].includes("$")) {
         if(data[i].includes(" cd")){
             if(data[i].slice(5) === "..") {
-                history.shift();
-                currentFolder = history.length > 0 ? currentFolder[history[0]] : system;
+                history.pop();
+                // macht kein sinn aber hat funktioniert??
+                currentFolder = history.length > 0 ? navigator(system,history) : system;
             }
             else if(data[i].slice(5) === "/") currentFolder = system;
             else {
-                history.unshift(data[i].slice(5));
+                history.push(data[i].slice(5));
                 currentFolder = currentFolder[data[i].slice(5)];
             }
         }
@@ -42,3 +44,25 @@ for (let i = 0; i < data.length; i++) {
         }
     }
 }
+
+let sumObject = {};
+rec(system,"/");
+function rec(systemObject,folder){
+    for(var key in systemObject){
+        if (typeof sumObject[folder] !== "number") sumObject[folder] = 0;
+
+        if(typeof systemObject[key] === "object") {
+            rec(systemObject[key],key);
+            sumObject[folder] += sumObject[key];
+        } else {
+            sumObject[folder] += systemObject[key];
+        }
+    }
+}
+
+let sum = 0;
+for (const key in sumObject) {
+    if(sumObject[key] <= 100000) sum += sumObject[key];
+}
+
+console.log(sum);
