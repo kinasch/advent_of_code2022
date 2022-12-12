@@ -24,7 +24,9 @@ for (let i = 0; i < data.length; i++) {
         grid[i][j] = parseInt(splitData[j]);
     }
 }
+console.table(grid);
 
+// 1
 let sum = (width-2)*2 + length*2;
 
 for (let li = 1; li < length-1; li++) {
@@ -46,5 +48,39 @@ for (let li = 1; li < length-1; li++) {
         if(visible > 0) { sum++; }
     }
 }
-
 console.log(sum);
+
+// 2
+let highestScore = 0;
+
+for (let li = 1; li < length-1; li++) {
+    for (let wi = 1; wi < width-1; wi++) {
+        let checkNumber = grid[li][wi];
+        let north=0, west=0, south=0, east=0;
+        for (let n = li-1; n >= 0; n--) {
+            north++;
+            if(checkNumber <= grid[n][wi]) {break;}
+        }
+        if(north===0) north = 1;
+        for (let w = wi-1; w >= 0; w--) {
+            west++;
+            if(checkNumber <= grid[li][w]) {break;}
+        }
+        if(west===0) west = 1;
+        for (let s = li+1; s < length; s++) {
+            south++;
+            if(checkNumber <= grid[s][wi]) {break;}
+        }
+        if(south===0) south = 1;
+        for (let e = wi+1; e < width; e++) {
+            east++;
+            if(checkNumber <= grid[li][e]) {break;}
+        }
+        if(east===0) east = 1;
+
+        let product = north*west*south*east;
+        console.log("Produkt: "+product,"Koords: ",li,wi);
+        highestScore = highestScore < product ? product : highestScore;
+    }
+}
+console.log(highestScore);
