@@ -59,3 +59,13 @@ for (const key in sumObject) {
 }
 
 console.log(sum);
+
+let smallestFolder = 70000000;
+for (const key in sumObject) {
+    let spaceAfterDeletion = sumObject["/"]-sumObject[key];
+    if(spaceAfterDeletion <=40000000){
+        smallestFolder = sumObject[key]<smallestFolder ? sumObject[key] : smallestFolder;
+    }
+}
+
+console.log(smallestFolder);
