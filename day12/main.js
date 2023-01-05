@@ -34,7 +34,7 @@ for (let y = 0; y < data.length; y++) {
 
         if(grid[y][x] === 'S') {
             startCoords = {"y":y,"x":x};
-            grid[y][x] = 'z';
+            grid[y][x] = 'a';
         }
         if(grid[y][x] === 'E') {
             endCoords = {"y":y,"x":x};
@@ -52,9 +52,15 @@ DISCLAIMER: Everything from this point on (except some minor modifications) is t
 ####################
 */
 
-let aGrid = Array.from(grid); //array of all the grid points
-
 let cols = height, rows = width;
+
+let aGrid = new Array(cols);//Array.from(grid); //array of all the grid points
+for (let i = 0; i < cols; i++) {
+    aGrid[i] = [];
+    for (let j = 0; j < rows; j++) {
+        aGrid[i].push(null);
+    }
+}
 
 let openSet = []; //array containing unevaluated grid points
 let closedSet = []; //array containing completely evaluated grid points
@@ -106,6 +112,18 @@ function GridPoint(x, y, letter) {
 
 //initializing the grid
 function init() {
+    openSet = [];
+    closedSet = [];
+    path = [];
+
+    aGrid = new Array(cols);
+    for (let i = 0; i < cols; i++) {
+        aGrid[i] = [];
+        for (let j = 0; j < rows; j++) {
+            aGrid[i].push(null);
+        }
+    }
+
     for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
             aGrid[i][j] = new GridPoint(i, j, grid[i][j]);
@@ -126,7 +144,6 @@ function init() {
 
 //A star search implementation
 function search() {
-    init();
     while (openSet.length > 0) {
         //assumption lowest index is the first one to begin with
         let lowestIndex = 0;
@@ -179,4 +196,31 @@ function search() {
     return [];
 }
 
-console.log(search().length-1);
+// ##############
+// Code from here on is not taken from the above mentioned source, but there will be usage of its functions
+// ##############
+
+// 1st *
+init();
+let searchT = search();
+console.log("1st star:",searchT.length-1);
+
+// 2nd *
+let aCandidates = [];
+for (let j = 0; j < aGrid.length; j++) {
+    if(aGrid[j][0].letter==='a'){
+        aCandidates.push(aGrid[j][0]);
+    }
+}
+
+let lowestPath = {"n":10000,"x":-1,"y":-1};
+for (const a of aCandidates) {
+    startCoords.x = a.y; startCoords.y = a.x;
+    init();
+    
+    let searchTable = search();
+    if(searchTable.length-1 < lowestPath.n) {
+        lowestPath={"n":searchTable.length-1,"x":a.x,"y":a.y};
+    }
+}
+console.log("2nd star:",lowestPath);
