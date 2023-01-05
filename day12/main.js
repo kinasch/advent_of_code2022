@@ -6,7 +6,6 @@ DISCLAIMER: This solution takes an algorithm from another source (I basically ga
             - Link: https://gist.github.com/RanjanSushant/4dd689b7c95cb7ccf56c41dcfc8db22e 
 ####################
 */
-let time = Date.now();
 const fs = require('fs');
 
 function readFromFile() {
@@ -45,82 +44,15 @@ for (let y = 0; y < data.length; y++) {
     }
 }
 
-//console.table(grid);
-/*
-let pos = {"y":0,"x":0,"letter":"a"};
-let lastPos = {"y":0,"x":0,"letter":"a"};
-let deadEnds = [];
-let ops = 0;
-while(pos.letter !== 'E'){
-    let currentChar = pos.letter.charCodeAt(0);
-    let surroundings = [];
-
-    if(pos.x+1<width) {
-        surroundings.push({"y":pos.y,"x":pos.x+1,"letter":grid[pos.y][pos.x+1]});
-    }
-    if(pos.x-1>=0) {
-        surroundings.push({"y":pos.y,"x":pos.x-1,"letter":grid[pos.y][pos.x-1]});
-    }
-    if(pos.y+1<height) {
-        surroundings.push({"y":pos.y+1,"x":pos.x,"letter":grid[pos.y+1][pos.x]});
-    }
-    if(pos.y-1>=0) {
-        surroundings.push({"y":pos.y-1,"x":pos.x,"letter":grid[pos.y-1][pos.x]});
-    }
-
-    surroundings.sort((a,b)=>{
-        if(a.letter === "E") return 1;
-        if(b.letter === "E") return -1;
-        if(a.letter.charCodeAt(0) > b.letter.charCodeAt(0)) return 1;
-        if(a.letter.charCodeAt(0) < b.letter.charCodeAt(0)) return -1;
-        return 0;
-    });
-
-    let foundNewPos = false;
-    for (let index = surroundings.length-1; index > 0; index--) {
-        let surCharCode = surroundings[index].letter === "E" ? "z".charCodeAt(0) : surroundings[index].letter.charCodeAt(0);
-        if(surCharCode <= pos.letter.charCodeAt(0)+1){
-            if(deadEnds.some(e=>e === surroundings[index]) || (lastPos.x===surroundings[index].x&&lastPos.y===surroundings[index].y)) continue;
-            // move
-            lastPos = structuredClone(pos);
-            pos = structuredClone(surroundings[index]);
-            foundNewPos = true;
-            break;
-        }
-    }
-    if(!foundNewPos){
-        deadEnds.push(pos);
-        pos = structuredClone(lastPos);
-    }
-    ops++;
-
-    let save = grid[pos.y][pos.x];
-    grid[pos.y][pos.x] += "1";
-    console.table(grid);
-    grid[pos.y][pos.x] = save;
-    console.log("\n")
-    console.log("Pos: ",pos,"\nSur",surroundings,"\nDead",deadEnds);
-    console.log("\n\n");
-
-
-    if(pos.letter === 'z'){
-        console.log();
-    }
-}
-console.log();
-console.log(ops);
-*/
-
 /* 
 ####################
-DISCLAIMER: Everything from this point on is taken from:
+DISCLAIMER: Everything from this point on (except some minor modifications) is taken from:
             - Author: Sushant Ranjan (github.com/RanjanSushant)
             - Link: https://gist.github.com/RanjanSushant/4dd689b7c95cb7ccf56c41dcfc8db22e
-            (slight modifications have been made to work with the rest)
 ####################
 */
 
-let aGrid = Array.from(grid); //array of all the grid points, *modified*
+let aGrid = Array.from(grid); //array of all the grid points
 
 let cols = height, rows = width;
 
@@ -144,7 +76,7 @@ function heuristic(position1, position0) {
 function GridPoint(x, y, letter) {
     this.x = x; //x location of the grid point
     this.y = y; //y location of the grid point
-    this.letter = letter; // letter at the grid point, *modified*
+    this.letter = letter; // letter at the grid point
     this.f = 0; //total cost function
     this.g = 0; //cost function from start to the current grid point
     this.h = 0; //heuristic estimated cost function from current grid point to the goal
@@ -152,7 +84,6 @@ function GridPoint(x, y, letter) {
     this.parent = undefined; // immediate source of the current grid point
 
     // update neighbors array for a given grid point
-    // *modified*
     this.updateNeighbors = function (grid) {
 
         let i = this.x;
@@ -174,7 +105,6 @@ function GridPoint(x, y, letter) {
 }
 
 //initializing the grid
-// *modified*
 function init() {
     for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
@@ -192,8 +122,6 @@ function init() {
     end = aGrid[endCoords.y][endCoords.x];
 
     openSet.push(start);
-
-    console.log(end.x,end.y);
 }
 
 //A star search implementation
@@ -207,7 +135,7 @@ function search() {
                 lowestIndex = i;
             }
         }
-        let current = openSet.shift()//[lowestIndex];
+        let current = openSet[lowestIndex];
 
         if (current === end) {
             let temp = current;
@@ -216,13 +144,12 @@ function search() {
                 path.push(temp.parent);
                 temp = temp.parent;
             }
-            console.log("DONE!");
             // return the traced path
             return path.reverse();
         }
 
         //remove current from openSet
-        //openSet.splice(lowestIndex, 1);
+        openSet.splice(lowestIndex, 1);
         //add current to closedSet
         closedSet.push(current);
 
@@ -251,31 +178,5 @@ function search() {
     //no solution by default
     return [];
 }
-let searchTable = search();
-console.table(searchTable);
-console.log((Date.now()-time)/1000)
 
-let vis = Array.from(grid);
-for (let i = 0; i < vis.length; i++) {
-    for (let j = 0; j < vis[i].length; j++) {
-        vis[i][j] = vis[i][j].letter;
-    }
-}
-for (let i = 0; i < searchTable.length-1; i++) {
-    // searchTable[i].x < searchTable[i+1].x ^
-    // 
-    let letter = '';
-    if(searchTable[i].x > searchTable[i+1].x) letter = '^';
-    if(searchTable[i].x < searchTable[i+1].x) letter = 'V';
-    if(searchTable[i].y > searchTable[i+1].y) letter = '<';
-    if(searchTable[i].y < searchTable[i+1].y) letter = '>';
-
-    vis[searchTable[i].x][searchTable[i].y] = letter;
-}
-let output = "";
-for (let i = 0; i < vis.length; i++) {
-    output += vis[i].toString().replaceAll(',','');
-    output+='\n';
-}
-
-fs.writeFileSync('./day12/visualize.txt', output);
+console.log(search().length-1);
